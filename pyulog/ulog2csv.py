@@ -116,4 +116,3 @@ def convert_ulog2csv(ulog_file_name, messages, output, delimiter, time_s, time_e
                     if k != last_elem:
                         csvfile.write(delimiter)
                 csvfile.write('\n')
-
