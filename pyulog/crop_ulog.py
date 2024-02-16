@@ -71,10 +71,9 @@ def crop_ulog(ulog_file_name, flight_start, flight_end):
     :return: None
     """
     print("\nStarting to crop ...")
-=======
+
 def modify_ulog(ulog_file_name):
     print("\nStarting modification ...")
->>>>>>> Stashed changes
 
     ulog = ULog(ulog_file_name)
     data = ulog.data_list
