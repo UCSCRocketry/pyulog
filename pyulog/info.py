@@ -7,7 +7,7 @@ from __future__ import print_function
 
 import argparse
 
-from .core import ULog
+from core import ULog
 
 #pylint: disable=too-many-locals, unused-wildcard-import, wildcard-import
 #pylint: disable=invalid-name
