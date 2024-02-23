@@ -368,7 +368,9 @@ class ULog(object):
         for message_format in self._message_formats.values():
             data = bytearray()
 
-            data.extend(bytes(message_format.name + ':', 'utf-8'))
+            # Convert the message format name to bytes using str.encode()
+            data.extend(message_format.name + ':')
+
             for field in message_format.fields:
                 # Determine the field type (e.g. int16_t or float[8])
                 field_type = field[0]
@@ -379,12 +381,14 @@ class ULog(object):
                     encoded_field = '%s[%d] %s;' % (field_type, field_count, field_name)
                 else:
                     encoded_field = '%s %s;' % (field_type, field_name)
-                data.extend(bytes(encoded_field, 'utf-8'))
+                # Convert the encoded field to bytes using str.encode()
+                data.extend(encoded_field)
 
             header = struct.pack('<HB', len(data), self.MSG_TYPE_FORMAT)
 
             file.write(header)
             file.write(data)
+
 
     def _write_logged_message_subscriptions(self, file):
         data_sets = sorted(self._data_list, key=lambda x: x.msg_id)
