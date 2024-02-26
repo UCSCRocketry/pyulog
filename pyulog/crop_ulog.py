@@ -6,7 +6,7 @@ Convert a ULog file into CSV file(s)
 """
 #commandline usage: python <file.ulg> -flight_start <insert timestamp value> -flight_end <insert timestamp value>
 #OURS: python crop_ulog.py Jan_Subscale_Launch.ulg -flight_start 19:20 -flight_end 21:40
-#make sure you use python not python3 this script does not support python3
+#make sure you use python, this script does not support python3
 
 
 from __future__ import print_function
@@ -39,10 +39,10 @@ def main():
     args = parser.parse_args()
     print("Completed argument parsing")
 
-    modify_ulog('./Jan_Subscale_Launch.ulg')
+    # modify_ulog('./Jan_Subscale_Launch.ulg')
 
-#<<<<<<< Updated upstream
- # Convert HH:MM format to seconds
+# # <<<<<<< Updated upstream
+# #  Convert HH:MM format to seconds
 #     flight_start_seconds = convert_to_seconds(args.flight_start)
 #     flight_end_seconds = convert_to_seconds(args.flight_end)
 
@@ -59,54 +59,53 @@ def main():
 #     return hours * 3600 + minutes * 60
 
 
-def modify_ulog(ulog_file_name):
-    print("\nStarting modification ...")
+# def modify_ulog(ulog_file_name):
+#     print("\nStarting modification ...")
+
+#     ulog = ULog(ulog_file_name)
+#     data = ulog.data_list
+
+#     for d in data:
+#         # Determine the start index for the last 1000 data points
+#         start_index = max(0, len(d.data['timestamp']) - 1000)
+
+#         # Delete data points that are not in the last 1000 entries
+#         for key, value in d.data.items():
+#             d.data[key] = value[start_index:]
+
+#     # Save the modified data back to the original file
+#     ulog.write_ulog(ulog_file_name)
+#     print("\nModifications saved to the original file")
+
+def crop_ulog(ulog_file_name, flight_start, flight_end):
+    print("\nStarting to crop ...")
 
     ulog = ULog(ulog_file_name)
     data = ulog.data_list
 
     for d in data:
-        # Determine the start index for the last 1000 data points
-        start_index = max(0, len(d.data['timestamp']) - 1000)
+        # Print basic information about the data message
+        print(f"\nData message: {d.name}")
+        print(f"Original timestamp length: {len(d.data['timestamp'])}")
 
-        # Delete data points that are not in the last 1000 entries
+        # Get the last 1000 data points
+        last_index = len(d.data['timestamp'])
+        start_index = max(0, last_index - 1000)  # Ensure start index is not negative
+
+        # Crop the data and print lengths before and after cropping
+        newData = {}
         for key, value in d.data.items():
-            d.data[key] = value[start_index:]
+            print(f"Length of '{key}' before cropping: {len(value)}")
+            croppedData = value[start_index:last_index]
+            newData[key] = croppedData
+            print(f"Length of '{key}' after cropping: {len(newData[key])}")
 
-    # Save the modified data back to the original file
-    ulog.write_ulog(ulog_file_name)
-    print("\nModifications saved to the original file")
+        # Check if all fields have the same length
+        lengths = [len(v) for v in newData.values()]
+        if len(set(lengths)) != 1:
+            print("Warning: Inconsistent data lengths after cropping")
 
-# def crop_ulog(ulog_file_name, flight_start, flight_end):
-#     print("\nStarting to crop ...")
-
-#     ulog = ULog(ulog_file_name)
-#     # ulog2 = ULog('cropped.ulg')
-#     data = ulog.data_list
-
-#     for d in data:
-#         # Print basic information about the data message
-#         print(f"\nData message: {d.name}")
-#         print(f"Original timestamp length: {len(d.data['timestamp'])}")
-
-#         # Get the last 1000 data points
-#         last_index = len(d.data['timestamp'])
-#         start_index = max(0, last_index - 1000)  # Ensure start index is not negative
-
-#         # Crop the data and print lengths before and after cropping
-#         newData = {}
-#         for key, value in d.data.items():
-#             print(f"Length of '{key}' before cropping: {len(value)}")
-#             croppedData = value[start_index:last_index]
-#             newData[key] = croppedData
-#             print(f"Length of '{key}' after cropping: {len(newData[key])}")
-
-#         # Check if all fields have the same length
-#         lengths = [len(v) for v in newData.values()]
-#         if len(set(lengths)) != 1:
-#             print("Warning: Inconsistent data lengths after cropping")
-
-#         d.data = newData
+        d.data = newData
 
     # Save cropped ulog file
     renamed_output_file = ulog_file_name[:-4] + '_last1000.ulg'
